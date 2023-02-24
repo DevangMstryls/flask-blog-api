@@ -1,0 +1,7 @@
+.venv/
+.run/
+*.env
+**/*.pyc
+__pycache__
+flask-blog-api-venv/
+database/blog.db
