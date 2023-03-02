@@ -3,7 +3,7 @@ import os
 from dotenv import load_dotenv
 from flask import Blueprint, Flask
 from flask_restful import Api
-from resources.auth_resources import RegisterRoute
+from resources.auth_resources import LoginRoute, RegisterRoute
 
 load_dotenv(verbose=True)
 
@@ -23,6 +23,7 @@ api = Api(auth_bp)
 
 # Register Routes
 api.add_resource(RegisterRoute, '/register')
+api.add_resource(LoginRoute, '/login')
 
 app.register_blueprint(auth_bp)
 
