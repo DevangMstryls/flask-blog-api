@@ -19,15 +19,12 @@ posts_bp = Blueprint('posts', __name__, url_prefix='/posts')
 
 
 api = Api(auth_bp)
-posts_api = Api(posts_bp)
 
 
 # Register Routes
 api.add_resource(RegisterRoute, '/register')
-posts_api.add_resource(RegisterRoute, '/one')
 
 app.register_blueprint(auth_bp)
-app.register_blueprint(posts_bp)
 
 
 if __name__ == '__main__':
