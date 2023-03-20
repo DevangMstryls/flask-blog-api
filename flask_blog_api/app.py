@@ -4,6 +4,8 @@ from dotenv import load_dotenv
 from flask import Blueprint, Flask
 from flask_restful import Api
 from resources.auth_resources import LoginRoute, RegisterRoute
+from resources.blog_resources import (AllBlogPostsRoute, BlogPostRoute,
+                                      CreateBlogPostRoute)
 
 load_dotenv(verbose=True)
 
@@ -19,13 +21,19 @@ posts_bp = Blueprint('posts', __name__, url_prefix='/posts')
 
 
 api = Api(auth_bp)
+posts_api = Api(posts_bp)
 
 
 # Register Routes
 api.add_resource(RegisterRoute, '/register')
 api.add_resource(LoginRoute, '/login')
 
+posts_api.add_resource(CreateBlogPostRoute, '/create')
+posts_api.add_resource(BlogPostRoute, '/<int:post_id>')
+posts_api.add_resource(AllBlogPostsRoute, '/')
+
 app.register_blueprint(auth_bp)
+app.register_blueprint(posts_bp)
 
 
 if __name__ == '__main__':
