@@ -14,3 +14,7 @@ class UserSchema(Schema):
     name = fields.Str()
     email = fields.Email()
     created_on = fields.DateTime()
+
+class LoggedInUserSchema(UserSchema): 
+    token = fields.Str()
+    password = fields.Str()

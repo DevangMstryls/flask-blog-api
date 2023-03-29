@@ -1,12 +1,16 @@
 from flask import request
 from flask_restful import Resource
 from helpers.database import get_db_connection
+from helpers.utils import (generate_auth_token, get_hashed_password,
+                           password_matches)
 from marshmallow import ValidationError
-from schemas.auth import LoginSchema, RegisterUserSchema, UserSchema
+from schemas.auth import (LoggedInUserSchema, LoginSchema, RegisterUserSchema,
+                          UserSchema)
 
 register_user_schema = RegisterUserSchema()
 login_schema = LoginSchema()
 user_schema = UserSchema()
+logged_in_user_schema = LoggedInUserSchema()
 
 class RegisterRoute(Resource):
     def post(self):
@@ -15,14 +19,27 @@ class RegisterRoute(Resource):
 
             data = register_user_schema.load(payload)
 
+            db_conn = get_db_connection()
+
+            user = db_conn.execute(
+                "SELECT * FROM users WHERE email = ?",
+                (data['email'],)
+            ).fetchone()
+
+            if user:
+                return {
+                    'success': False,
+                    'error': 'User with that email already exists'
+                }, 400
+
             name = data['name']
             email = data['email']
-            password = data['password']
+            password = get_hashed_password(data['password'])
+            token = generate_auth_token()
 
-            db_conn = get_db_connection()
             db_conn.execute(
-                "INSERT INTO users (name, email, password) VALUES (?, ?, ?)",
-                (name, email, password)
+                "INSERT INTO users (name, email, password, token) VALUES (?, ?, ?, ?)",
+                (name, email, password, token)
             )
 
             db_conn.commit()
@@ -60,6 +77,8 @@ class LoginRoute(Resource):
             ).fetchone()
             db_conn.close()
 
+            user_obj = logged_in_user_schema.dump(user)
+
             # validations
             if user is None:
                 return {
@@ -67,17 +86,17 @@ class LoginRoute(Resource):
                     'error': 'User does not exists'
                 }, 404
             
-            if user['password'] != password:
+            if password_matches(password, user_obj['password']):
                 return {
                     'success': False,
                     'error': 'Incorrect password'
                 }, 401
             
-            result = user_schema.dump(user)
+            # result = logged_in_user_schema.dump(user)
 
             return {
                 'success': True,
-                'data': result,
+                'data': user_obj,
             }, 200
         except ValidationError as e:
             return {

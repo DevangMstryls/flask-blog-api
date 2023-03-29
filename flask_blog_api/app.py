@@ -3,6 +3,7 @@ import os
 from dotenv import load_dotenv
 from flask import Blueprint, Flask
 from flask_restful import Api
+from middlewares.authentication_middleware import AuthenticationMiddleware
 from resources.auth_resources import LoginRoute, RegisterRoute
 from resources.blog_resources import (AllBlogPostsRoute, BlogPostRoute,
                                       CreateBlogPostRoute)
@@ -35,6 +36,8 @@ posts_api.add_resource(AllBlogPostsRoute, '/')
 app.register_blueprint(auth_bp)
 app.register_blueprint(posts_bp)
 
+
+app.wsgi_app = AuthenticationMiddleware(app.wsgi_app)
 
 if __name__ == '__main__':
     app.run(debug=True, port=5001)
