@@ -1,4 +1,3 @@
-import datetime
 import json
 
 from helpers.utils import get_token_from_request

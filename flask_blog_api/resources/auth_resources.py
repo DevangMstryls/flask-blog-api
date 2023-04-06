@@ -20,7 +20,6 @@ class RegisterRoute(Resource):
             data = register_user_schema.load(payload)
 
             db_conn = get_db_connection()
-
             user = db_conn.execute(
                 "SELECT * FROM users WHERE email = ?",
                 (data['email'],)
@@ -91,8 +90,6 @@ class LoginRoute(Resource):
                     'success': False,
                     'error': 'Incorrect password'
                 }, 401
-            
-            # result = logged_in_user_schema.dump(user)
 
             return {
                 'success': True,

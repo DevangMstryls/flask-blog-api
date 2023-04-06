@@ -5,3 +5,4 @@
 __pycache__
 flask-blog-api-venv/
 database/blog.db
+flask_blog_api/requirements.txt
